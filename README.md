@@ -1,4 +1,4 @@
-# **** MiniGit OOP | C++17 Version Control System & Visualizer ****
+#MiniGit OOP | C++17 Version Control System & Visualizer
 Link: https://gitversion.vercel.app/
 
 <div align="center">
