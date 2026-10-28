@@ -1,4 +1,5 @@
-# 🚀 MiniGit OOP | C++17 Version Control System & Visualizer
+# **** MiniGit OOP | C++17 Version Control System & Visualizer ****
+Link: https://gitversion.vercel.app/
 
 <div align="center">
 
@@ -211,23 +212,8 @@ cmake --build .
 
 ---
 
-## 🚀 Deploying to Vercel
-
-The included web simulator is configured for seamless zero-config deployment on Vercel:
-
-### Option 1: Import GitHub Repository to Vercel (1-Click)
-1. Go to [vercel.com/new](https://vercel.com/new).
-2. Connect your GitHub account and select repository `Git_Version-`.
-3. Keep default settings (`Other` framework, root directory `./`).
-4. Click **Deploy**. Vercel will deploy the site worldwide across edge nodes in seconds!
-
-### Option 2: Deploy via Vercel CLI
-```bash
-# Install / run Vercel CLI
-npx vercel --prod
-```
-
-The repository includes `vercel.json` with clean URL routing and production security headers.
+##  Deploying to Vercel
+https://gitversion.vercel.app/
 
 ---
 
