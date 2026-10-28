@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MiniGit OOP | Modern C++ Version Control Simulator & Visualizer</title>
+  <meta name="description" content="A dynamic, interactive black-themed web visualizer and terminal emulator for MiniGit - an Object-Oriented C++ Version Control System implementing FNV-1a 64-bit content-addressable storage.">
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="styles.css">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2310b981' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><circle cx='18' cy='18' r='3'/><circle cx='6' cy='6' r='3'/><path d='M6 9v12'/><path d='M18 9a9 9 0 0 0-9 9'/></svg>">
+</head>
+<body class="dark-theme">
+  <!-- Glowing Matrix / Cyber Aura Background -->
+  <div class="bg-gradient-glow"></div>
+  <div class="grid-overlay"></div>
+
+  <!-- Top Navigation Header -->
+  <header class="app-header">
+    <div class="header-left">
+      <div class="logo-wrapper">
+        <div class="logo-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="18" cy="18" r="3"/>
+            <circle cx="6" cy="6" r="3"/>
+            <path d="M6 9v12"/>
+            <path d="M18 9a9 9 0 0 0-9 9"/>
+          </svg>
+        </div>
+        <div class="logo-text">
+          <span class="logo-title">MiniGit <span class="badge-oop">OOP</span></span>
+          <span class="logo-subtitle">C++17 Version Control Engine</span>
+        </div>
+      </div>
+      <div class="status-pill initialized-pill" id="repoStatusPill">
+        <span class="pulse-dot"></span>
+        <span id="repoStatusText">Uninitialized (.minigit not created)</span>
+      </div>
+    </div>
+
+    <!-- Live Telemetry Counters -->
+    <div class="header-stats">
+      <div class="stat-card" title="Total Commits created in this session">
+        <span class="stat-label">Commits</span>
+        <span class="stat-value neon-green" id="statCommits">0</span>
+      </div>
+      <div class="stat-card" title="Files staged in .minigit/index">
+        <span class="stat-label">Staged</span>
+        <span class="stat-value neon-cyan" id="statStaged">0</span>
+      </div>
+      <div class="stat-card" title="Objects stored in .minigit/objects/">
+        <span class="stat-label">Objects</span>
+        <span class="stat-value neon-purple" id="statObjects">0</span>
+      </div>
+      <div class="stat-card" title="Current Active Branch">
+        <span class="stat-label">HEAD</span>
+        <span class="stat-value neon-amber" id="statHead">None</span>
+      </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="header-actions">
+      <button class="btn btn-tour" id="btnStartTour" title="Run interactive walkthrough">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        <span>Interactive Tour</span>
+      </button>
+      <button class="btn btn-icon" id="btnToggleSound" title="Toggle Sound Effects (Mechanical Clicks & Audio Feedback)">
+        <span id="soundIcon">🔊</span>
+      </button>
+      <button class="btn btn-icon" id="btnResetRepo" title="Reset all repo state">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+      </button>
+      <a href="https://github.com/ayushixx/Git_Version-" target="_blank" rel="noopener" class="btn btn-github">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+        <span>GitHub</span>
+      </a>
+    </div>
+  </header>
+
+  <!-- Navigation Tab Bar -->
+  <nav class="tab-nav">
+    <button class="tab-btn active" data-tab="tab-terminal">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
+      <span>Interactive Terminal & DAG</span>
+    </button>
+    <button class="tab-btn" data-tab="tab-oop">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+      <span>OOP Architecture & Patterns</span>
+    </button>
+    <button class="tab-btn" data-tab="tab-hasher">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+      <span>Live FNV-1a Hash Sandbox</span>
+    </button>
+    <button class="tab-btn" data-tab="tab-cpp">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+      <span>C++ Source & Build Guide</span>
+    </button>
+    <button class="tab-btn" data-tab="tab-internals">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+      <span>.minigit File Store</span>
+    </button>
+  </nav>
+
+  <!-- Main Content Container -->
+  <main class="main-content">
+    
+    <!-- TAB 1: TERMINAL & GIT GRAPH VISUALIZER -->
+    <section class="tab-pane active" id="tab-terminal">
+      <div class="split-layout">
+        
+        <!-- Left Pane: Terminal Emulator -->
+        <div class="terminal-panel">
+          <div class="terminal-window">
+            <div class="terminal-titlebar">
+              <div class="window-controls">
+                <span class="control-btn close"></span>
+                <span class="control-btn minimize"></span>
+                <span class="control-btn expand"></span>
+              </div>
+              <div class="window-title">
+                <span class="terminal-shell-badge">zsh</span>
+                <span>ayushi@minigit-oop: ~/projects/repo</span>
+              </div>
+              <div class="window-tools">
+                <button class="icon-tool-btn" id="btnClearTerminal" title="Clear terminal screen (Ctrl+L)">Clear</button>
+                <button class="icon-tool-btn" id="btnHelpTerminal" title="Show command manual">Help</button>
+              </div>
+            </div>
+
+            <!-- Terminal Output Area -->
+            <div class="terminal-body" id="terminalBody">
+              <div class="term-line term-welcome">
+                <span class="term-accent">MiniGit C++ OOP Terminal Simulator v1.0.0</span>
+              </div>
+              <div class="term-line term-dim">Type <span class="term-cmd">help</span> to view all commands, or click any quick-action chip below.</div>
+              <div class="term-line term-dim">Powered by 64-bit FNV-1a content-addressable storage matching <span class="term-highlight">mini_git_oop.cpp</span>.</div>
+              <div class="term-line">---------------------------------------------------------</div>
+            </div>
+
+            <!-- Terminal Command Input Line -->
+            <div class="terminal-input-bar">
+              <span class="term-prompt">
+                <span class="prompt-user">minigit</span><span class="prompt-separator">:</span><span class="prompt-dir">~</span><span class="prompt-symbol">$</span>
+              </span>
+              <input type="text" id="terminalInput" class="terminal-input" placeholder="minigit init, add, commit -m, log, status..." autofocus autocomplete="off" spellcheck="false">
+              <button class="btn-execute" id="btnExecuteCmd">
+                <span>Run</span>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- Quick Action Command Chips -->
+          <div class="quick-commands-bar">
+            <span class="chips-label">Quick Actions:</span>
+            <button class="cmd-chip" data-cmd="minigit init" title="Initialize repository (.minigit)">minigit init</button>
+            <button class="cmd-chip" data-cmd="touch main.cpp &quot;#include &lt;iostream&gt;\nint main() { return 0; }&quot;" title="Create main.cpp">touch main.cpp</button>
+            <button class="cmd-chip" data-cmd="minigit add main.cpp" title="Stage main.cpp into index">minigit add main.cpp</button>
+            <button class="cmd-chip" data-cmd="minigit commit -m &quot;Initial commit: add main.cpp&quot;" title="Commit staged files">minigit commit -m "..."</button>
+            <button class="cmd-chip" data-cmd="minigit log" title="Display commit history">minigit log</button>
+            <button class="cmd-chip" data-cmd="minigit status" title="Show staging and repository status">status</button>
+            <button class="cmd-chip" data-cmd="cat .minigit/index" title="Inspect raw staging index">cat .minigit/index</button>
+          </div>
+        </div>
+
+        <!-- Right Pane: Interactive DAG & Live Repository State -->
+        <div class="visualizer-panel">
+          
+          <!-- DAG Git Commit Graph -->
+          <div class="card graph-card">
+            <div class="card-header">
+              <div class="card-title">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="18" r="3"/><circle cx="6" cy="6" r="3"/><path d="M6 9v12"/><path d="M18 9a9 9 0 0 0-9 9"/></svg>
+                <span>Interactive Commit DAG (Branch History)</span>
+              </div>
+              <div class="graph-legend">
+                <span class="legend-item"><span class="node-legend head-node"></span> HEAD</span>
+                <span class="legend-item"><span class="node-legend commit-node"></span> Commit</span>
+              </div>
+            </div>
+            
+            <div class="graph-container" id="graphContainer">
+              <div class="graph-empty" id="graphEmptyState">
+                <div class="empty-icon">🌱</div>
+                <div class="empty-title">Repository Empty or Uninitialized</div>
+                <div class="empty-desc">Run <code class="code-inline">minigit init</code> in the terminal, stage a file with <code class="code-inline">minigit add</code>, and create your first commit!</div>
+              </div>
+              <!-- Dynamically populated SVG DAG nodes -->
+              <svg id="dagSvg" class="dag-svg" width="100%" height="100%"></svg>
+              <div id="dagNodesLayer" class="dag-nodes-layer"></div>
+            </div>
+          </div>
+
+          <!-- Staging Index & Working Directory Cards -->
+          <div class="state-grid">
+            
+            <!-- Staging Area (.minigit/index) -->
+            <div class="card state-card">
+              <div class="card-header">
+                <div class="card-title">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#06b6d4" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+                  <span>Staging Area (<code class="code-inline">.minigit/index</code>)</span>
+                </div>
+                <span class="badge" id="badgeStagedCount">0 files</span>
+              </div>
+              <div class="card-body scroll-body" id="stagedList">
+                <div class="empty-subtext">No files currently staged. Use <code class="code-inline">minigit add &lt;filename&gt;</code> to stage.</div>
+              </div>
+            </div>
+
+            <!-- Working Tree Files -->
+            <div class="card state-card">
+              <div class="card-header">
+                <div class="card-title">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="13 2 13 9 20 9"/></svg>
+                  <span>Working Directory</span>
+                </div>
+                <button class="btn btn-xs btn-outline" id="btnQuickNewFile">+ New File</button>
+              </div>
+              <div class="card-body scroll-body" id="workingFileList">
+                <!-- Working files dynamically rendered -->
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+    <!-- TAB 2: OOP ARCHITECTURE & DESIGN PATTERNS -->
+    <section class="tab-pane" id="tab-oop">
+      <div class="oop-hero">
+        <h2 class="section-title">Object-Oriented Architecture of MiniGit</h2>
+        <p class="section-desc">
+          How modern C++ Object-Oriented Programming (OOP) transforms low-level file I/O and cryptographic hashing into an extensible, robust version control system.
+        </p>
+      </div>
+
+      <div class="oop-grid">
+        <!-- Class 1: FileObject -->
+        <div class="oop-card" data-class="FileObject">
+          <div class="oop-card-tag encapsulation">Encapsulation & Immutability</div>
+          <div class="oop-class-header">
+            <span class="oop-type">class</span>
+            <h3 class="oop-name">FileObject</h3>
+          </div>
+          <p class="oop-summary">
+            Encapsulates file data, filename, and content-addressable hashing. Private members prevent mutation after instantiation.
+          </p>
+          <div class="oop-members">
+            <div class="member-group">
+              <span class="member-type private">private:</span>
+              <code>string filename;</code>
+              <code>string content;</code>
+              <code>string hash;</code>
+            </div>
+            <div class="member-group">
+              <span class="member-type public">public:</span>
+              <code>FileObject(const string& name, const string& data);</code>
+              <code>static string makeHash(const string& data); // FNV-1a</code>
+              <code>bool save(const fs::path& objectsDirectory) const;</code>
+            </div>
+          </div>
+          <div class="oop-callout">
+            <strong>Key OOP Principle:</strong> Content-Addressable Storage (CAS) ensures that two identical file contents always yield the same hash, deduplicating storage in <code class="code-inline">.minigit/objects/</code>.
+          </div>
+        </div>
+
+        <!-- Class 2: Commit -->
+        <div class="oop-card" data-class="Commit">
+          <div class="oop-card-tag abstraction">Abstraction & Serialization</div>
+          <div class="oop-class-header">
+            <span class="oop-type">class</span>
+            <h3 class="oop-name">Commit</h3>
+          </div>
+          <p class="oop-summary">
+            Models a point-in-time immutable snapshot of the repository, binding commit metadata, timestamps, and staged file references.
+          </p>
+          <div class="oop-members">
+            <div class="member-group">
+              <span class="member-type private">private:</span>
+              <code>string id;</code>
+              <code>string message;</code>
+              <code>string timestamp;</code>
+              <code>vector&lt;StagedFile&gt; files;</code>
+            </div>
+            <div class="member-group">
+              <span class="member-type public">public:</span>
+              <code>Commit(id, message, time, files);</code>
+              <code>bool save(const fs::path& dir) const;</code>
+              <code>void display() const;</code>
+            </div>
+          </div>
+          <div class="oop-callout">
+            <strong>Key OOP Principle:</strong> Snapshot Separation. The Commit object treats the StagedFile list as an immutable record serialized into <code class="code-inline">&lt;id&gt;.commit</code>.
+          </div>
+        </div>
+
+        <!-- Class 3: Repository -->
+        <div class="oop-card" data-class="Repository">
+          <div class="oop-card-tag facade">Facade Pattern & State Manager</div>
+          <div class="oop-class-header">
+            <span class="oop-type">class</span>
+            <h3 class="oop-name">Repository</h3>
+          </div>
+          <p class="oop-summary">
+            Serves as the high-level Facade encapsulating the file-system state, index parsing, staging table, and disk commits.
+          </p>
+          <div class="oop-members">
+            <div class="member-group">
+              <span class="member-type private">private:</span>
+              <code>const fs::path root = ".minigit";</code>
+              <code>bool loadIndex(); bool saveIndex() const;</code>
+              <code>static string currentTime();</code>
+            </div>
+            <div class="member-group">
+              <span class="member-type public">public:</span>
+              <code>bool init();</code>
+              <code>bool addFile(const string& filename);</code>
+              <code>bool commitChanges(const string& message);</code>
+              <code>bool showHistory() const;</code>
+            </div>
+          </div>
+          <div class="oop-callout">
+            <strong>Key OOP Principle:</strong> Facade & Information Hiding. Callers interact with simple verbs without knowing how <code class="code-inline">std::filesystem</code> or atomic index updates happen.
+          </div>
+        </div>
+
+        <!-- Class 4: Command Hierarchy -->
+        <div class="oop-card" data-class="Command">
+          <div class="oop-card-tag polymorphism">Polymorphism & Command Pattern</div>
+          <div class="oop-class-header">
+            <span class="oop-type">abstract class</span>
+            <h3 class="oop-name">Command &lt;Polymorphic&gt;</h3>
+          </div>
+          <p class="oop-summary">
+            Decouples CLI input parsing in <code class="code-inline">main()</code> from execution logic using dynamic dispatch and virtual functions.
+          </p>
+          <div class="oop-members">
+            <div class="member-group">
+              <span class="member-type public">public:</span>
+              <code>virtual bool execute(Repository&, const vector&lt;string&gt;&) = 0;</code>
+              <code>virtual ~Command() = default;</code>
+            </div>
+            <div class="member-subclasses">
+              <span class="subclass-badge">InitCommand</span>
+              <span class="subclass-badge">AddCommand</span>
+              <span class="subclass-badge">CommitCommand</span>
+              <span class="subclass-badge">LogCommand</span>
+            </div>
+          </div>
+          <div class="oop-callout">
+            <strong>Key OOP Principle:</strong> Open/Closed Principle (OCP). Adding new commands (like <code class="code-inline">branch</code>, <code class="code-inline">checkout</code>, or <code class="code-inline">diff</code>) requires zero modifications to existing command classes.
+          </div>
+        </div>
+      </div>
+
+      <!-- Interactive Design Pattern Flow Diagram -->
+      <div class="pattern-flow-card">
+        <h3 class="pattern-title">Polymorphic Execution Flow in mini_git_oop.cpp</h3>
+        <div class="flow-diagram">
+          <div class="flow-node">
+            <span class="node-badge">CLI Input</span>
+            <div class="node-content">argv: ["commit", "-m", "..."]</div>
+          </div>
+          <div class="flow-arrow">➔</div>
+          <div class="flow-node">
+            <span class="node-badge">Factory / Dispatch</span>
+            <div class="node-content">std::unique_ptr&lt;Command&gt; = make_unique&lt;CommitCommand&gt;()</div>
+          </div>
+          <div class="flow-arrow">➔</div>
+          <div class="flow-node">
+            <span class="node-badge">Virtual Dispatch</span>
+            <div class="node-content">command-&gt;execute(repository, args)</div>
+          </div>
+          <div class="flow-arrow">➔</div>
+          <div class="flow-node highlight">
+            <span class="node-badge">Repository Facade</span>
+            <div class="node-content">repository.commitChanges(message)</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 3: LIVE FNV-1a HASH SANDBOX -->
+    <section class="tab-pane" id="tab-hasher">
+      <div class="hasher-container">
+        <div class="hasher-header">
+          <h2 class="section-title">Real-Time FNV-1a 64-bit Content Hasher</h2>
+          <p class="section-desc">
+            Type or paste any text below to watch MiniGit calculate the exact 64-bit FNV-1a hexadecimal hash in real time, matching <code class="code-inline">FileObject::makeHash()</code> byte-for-byte.
+          </p>
+        </div>
+
+        <div class="hasher-layout">
+          <!-- Live Editor -->
+          <div class="hasher-editor-card">
+            <div class="editor-header">
+              <div class="file-name-input-group">
+                <label for="hasherFilename">Virtual File:</label>
+                <input type="text" id="hasherFilename" value="demo.txt" class="input-dark">
+              </div>
+              <div class="editor-stats">
+                <span id="charCount">0 characters</span>
+                <span id="byteCount">0 bytes</span>
+              </div>
+            </div>
+            <textarea id="hasherTextarea" class="hasher-textarea" placeholder="Type here to observe live hashing (e.g. Hello MiniGit OOP)...">Hello MiniGit OOP!
+This file is being hashed using 64-bit FNV-1a algorithm.</textarea>
+            
+            <div class="editor-footer">
+              <button class="btn btn-primary" id="btnSaveToWorkingDir">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+                <span>Save to Working Directory</span>
+              </button>
+              <button class="btn btn-secondary" id="btnDirectStage">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+                <span>Stage Directly into .minigit/index</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Hash Display Board -->
+          <div class="hasher-result-card">
+            <div class="result-box">
+              <div class="result-label">Computed 64-Bit FNV-1a Hash (16-Hex Characters)</div>
+              <div class="hash-value-display neon-glow" id="liveHashResult">0000000000000000</div>
+              <div class="hash-meta">
+                <div class="meta-row">
+                  <span class="meta-name">Storage Destination:</span>
+                  <span class="meta-val" id="objectPathDisplay">.minigit/objects/0000000000000000</span>
+                </div>
+                <div class="meta-row">
+                  <span class="meta-name">FNV Offset Basis:</span>
+                  <span class="meta-val">14695981039346656037 (0xcbf29ce484222325)</span>
+                </div>
+                <div class="meta-row">
+                  <span class="meta-name">FNV Prime (64-bit):</span>
+                  <span class="meta-val">1099511628211 (0x100000001b3)</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- C++ Code snippet comparison -->
+            <div class="snippet-box">
+              <div class="snippet-title">C++ makeHash Implementation:</div>
+              <pre class="snippet-code"><code>uint64_t value = 14695981039346656037ULL;
+for (unsigned char ch : data) {
+    value ^= ch;
+    value *= 1099511628211ULL;
+}
+ostringstream output;
+output &lt;&lt; hex &lt;&lt; setw(16) &lt;&lt; setfill('0') &lt;&lt; value;
+return output.str();</code></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 4: C++ SOURCE CODE & COMPILATION -->
+    <section class="tab-pane" id="tab-cpp">
+      <div class="cpp-container">
+        <div class="cpp-header">
+          <div>
+            <h2 class="section-title">mini_git_oop.cpp Source Code</h2>
+            <p class="section-desc">Clean, modern C++17 implementation demonstrating clean OOP, RAII, and standard filesystem utilities.</p>
+          </div>
+          <div class="cpp-actions">
+            <button class="btn btn-outline" id="btnCopyCppCode">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              <span>Copy C++ Code</span>
+            </button>
+            <a href="https://github.com/ayushixx/Git_Version-/blob/main/mini_git_oop.cpp" target="_blank" rel="noopener" class="btn btn-primary">
+              <span>View on GitHub</span>
+            </a>
+          </div>
+        </div>
+
+        <!-- Build Instructions Bar -->
+        <div class="build-bar">
+          <div class="build-step">
+            <span class="step-num">1</span>
+            <div class="step-details">
+              <span class="step-title">Compile with Clang / GCC:</span>
+              <code class="code-snippet">clang++ -std=c++17 -Wall -Wextra -O2 mini_git_oop.cpp -o minigit</code>
+            </div>
+          </div>
+          <div class="build-step">
+            <span class="step-num">2</span>
+            <div class="step-details">
+              <span class="step-title">Or use Makefile / CMake:</span>
+              <code class="code-snippet">make test</code>
+            </div>
+          </div>
+        </div>
+
+        <!-- Syntax Highlighted Code Viewer -->
+        <div class="code-viewer-card">
+          <div class="code-viewer-header">
+            <span class="file-tab active">mini_git_oop.cpp</span>
+            <span class="lang-tag">C++17</span>
+          </div>
+          <pre class="code-viewer-body" id="cppSourceCode"><code>// Loading C++ Source Code...</code></pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 5: .MINIGIT REPOSITORY INTERNALS -->
+    <section class="tab-pane" id="tab-internals">
+      <div class="internals-container">
+        <div class="internals-header">
+          <h2 class="section-title">Repository Internal Filesystem (.minigit/)</h2>
+          <p class="section-desc">Inspect how files are physically stored on disk in the MiniGit directory structure.</p>
+        </div>
+
+        <div class="internals-grid">
+          <!-- Folder 1: .minigit/objects/ -->
+          <div class="internals-card">
+            <div class="internals-card-header">
+              <span class="dir-icon">📁</span>
+              <h3>.minigit/objects/</h3>
+              <span class="badge" id="internalsObjectsCount">0 objects</span>
+            </div>
+            <p class="internals-desc">Content-addressable file blobs indexed by their 16-hex FNV-1a hash.</p>
+            <div class="internals-list" id="internalsObjectsList">
+              <div class="empty-subtext">No objects saved yet.</div>
+            </div>
+          </div>
+
+          <!-- Folder 2: .minigit/commits/ -->
+          <div class="internals-card">
+            <div class="internals-card-header">
+              <span class="dir-icon">📁</span>
+              <h3>.minigit/commits/</h3>
+              <span class="badge" id="internalsCommitsCount">0 commits</span>
+            </div>
+            <p class="internals-desc">Commit metadata files containing message, timestamp, and file list snapshots.</p>
+            <div class="internals-list" id="internalsCommitsList">
+              <div class="empty-subtext">No commits made yet.</div>
+            </div>
+          </div>
+
+          <!-- File 3: .minigit/index -->
+          <div class="internals-card">
+            <div class="internals-card-header">
+              <span class="dir-icon">📄</span>
+              <h3>.minigit/index</h3>
+              <span class="badge" id="internalsIndexStatus">Empty</span>
+            </div>
+            <p class="internals-desc">The staging index tracking files queued for the next commit snapshot.</p>
+            <pre class="index-raw-viewer" id="internalsIndexContent"><code>[Index file empty]</code></pre>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Object/Commit Raw Inspector Modal -->
+  <div class="modal-backdrop" id="inspectorModal">
+    <div class="modal-window">
+      <div class="modal-header">
+        <div class="modal-title" id="modalTitle">Inspect Object</div>
+        <button class="modal-close" id="btnModalClose">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="modal-meta" id="modalMeta"></div>
+        <pre class="modal-code" id="modalContent"></pre>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" id="btnModalDismiss">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Interactive Tour Overlay -->
+  <div class="tour-backdrop" id="tourBackdrop">
+    <div class="tour-card" id="tourCard">
+      <div class="tour-header">
+        <span class="tour-badge" id="tourStepBadge">Step 1 of 5</span>
+        <button class="tour-close" id="btnTourClose">&times;</button>
+      </div>
+      <h3 class="tour-title" id="tourTitle">Welcome to MiniGit OOP</h3>
+      <p class="tour-text" id="tourText">
+        MiniGit is an educational Version Control System written in modern C++ that implements content-addressable storage. Let's see it in action!
+      </p>
+      <div class="tour-action-preview" id="tourActionPreview">
+        <code>minigit init</code>
+      </div>
+      <div class="tour-footer">
+        <button class="btn btn-outline" id="btnTourPrev">Back</button>
+        <button class="btn btn-primary" id="btnTourNext">Auto-Run Step ➔</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="app-footer">
+    <div class="footer-content">
+      <div class="footer-left">
+        <span>MiniGit OOP &copy; 2026. Built with modern C++17 &amp; Vanilla Web Technologies.</span>
+      </div>
+      <div class="footer-right">
+        <span class="footer-tag">C++17 Engine</span>
+        <span class="footer-tag">FNV-1a 64-bit</span>
+        <span class="footer-tag">Command Pattern</span>
+        <a href="https://github.com/ayushixx/Git_Version-" target="_blank" rel="noopener" class="footer-link">GitHub Repository</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
